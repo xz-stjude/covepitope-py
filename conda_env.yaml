@@ -1,0 +1,19 @@
+name: conga-covepitope
+channels:
+  - conda-forge
+  - bioconda
+  - intel
+  - defaults
+dependencies:
+  - conda-forge::python=3.6
+  - conda-forge::ipython
+  - conda-forge::leidenalg
+  - conda-forge::louvain
+  - conda-forge::notebook
+  - conda-forge::numba
+  - conda-forge::pytables
+  - conda-forge::python-igraph
+  - conda-forge::scikit-learn
+  - conda-forge::seaborn
+  - conda-forge::statsmodels
+  - intel::tbb
