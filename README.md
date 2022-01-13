@@ -4,6 +4,9 @@ CovEpitope Python SDK
 This is a companion Python package for the CovEpitope web application. It contains
 scripts that help process data for CovEpitope.
 
+Table of content
+----------------
+
 * [Installation](#installation)
   + [Install Anaconda/Miniconda](#install-anaconda-miniconda)
   + [Install CoNGA](#install-conga)
