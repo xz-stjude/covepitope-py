@@ -19,7 +19,12 @@ def covepitope_convert_from_10x():
         '--organism',
         dest='organism',
         default='human',
-        help='human, ',
+    )
+    parser.add_argument(
+        '--edge-threshold',
+        dest='edge_threshold',
+        default=100,
+        help='Any edge that has distance above this number will be removed from the output edge table. This is to reduce the file size. (default: 100)',
     )
     parser.add_argument(
         'clones_csv',
@@ -39,7 +44,7 @@ def covepitope_convert_from_10x():
     df = pd.read_csv(temp_clones_file.name, sep='\t')
     df = df.rename(
         columns={
-            'clone_id': 'index',
+            'clone_id': 'original_index',
             'subject': 'donor',
             'va_gene': 'v_a_gene',
             'ja_gene': 'j_a_gene',
@@ -54,13 +59,17 @@ def covepitope_convert_from_10x():
             'cdr3b_nucseq': 'cdr3_b_nucseq',
         }
     )
+    df['index'] = np.arange(len(df))
     df.to_csv(args.clones_csv, index=False)
 
     # tuples of tuples with tcr info
     tcrs = [((l.v_a_gene, l.j_a_gene, l.cdr3_a_aa), (l.v_b_gene, l.j_b_gene, l.cdr3_b_aa)) for l in df.itertuples()]
 
     D_cpp = calc_tcrdist_matrix_cpp(tcrs, args.organism).astype(np.uint)
-    df_edges = pd.DataFrame(D_cpp).reset_index().melt('index').rename(columns={'variable': 'index_end', 'value': 'dist'}).assign(pw_type='pw_both')
+    df_edges = pd.DataFrame(D_cpp).reset_index().melt('index')
+    df_edges = df_edges.rename(columns={'variable': 'index_end', 'value': 'dist'})
+    df_edges['pw_type'] = 'pw_both'
+    df_edges = df_edges.loc[df_edges['dist'] <= args.edge_threshold]
     df_edges.to_csv(args.edges_csv, index=False)
 
     # alternatively we can use the slower python TCRdist calculator.
